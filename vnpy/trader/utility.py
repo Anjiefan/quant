@@ -807,6 +807,14 @@ class ArrayManager(object):
         return result[-1]
 
 
+
+
+class VanArrayManager(ArrayManager):
+    def open(self):
+        pass
+
+
+
 def virtual(func: Callable) -> Callable:
     """
     mark a function as "virtual", which means that this function can be override.
