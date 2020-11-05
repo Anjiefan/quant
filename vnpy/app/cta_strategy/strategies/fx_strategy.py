@@ -40,7 +40,7 @@ class FxStrategy(CtaTemplate):
         self.bg = BarGenerator(self.on_bar)
 
         # 时间序列容器：计算技术指标用
-        self.am = GanManager()
+        self.am = GanManager(size=10)
 
     def on_init(self):
         """

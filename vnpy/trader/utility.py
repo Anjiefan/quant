@@ -809,9 +809,7 @@ class ArrayManager(object):
 
 
 
-class VanArrayManager(ArrayManager):
-    def open(self):
-        pass
+
 
 class GanManager(ArrayManager):
     def up_fx(self):
