@@ -94,32 +94,33 @@ class FxMzStrategy(CtaTemplate):
         ##############################################################################
         # 指标信号发送池子
         # 计算快速均线
+        datetime = bar.datetime
         up_fx = am.up_fx()
         down_fx = am.down_fx()
         up_mz = am.up_mz()
         down_mz = am.down_mz()
         # 买入信号
         if up_fx != 0:
+            sell_inform = True
+        else:
+            sell_inform = False
+        if down_fx != 0:
             buy_inform = True
+            if sell_inform:
+                buy_inform = False
+                sell_inform = False
         else:
             buy_inform = False
-        # if down_fx != 0:
-        #     sell_inform = True
-        #     if buy_inform:
-        #         buy_inform = False
-        #         sell_inform = False
-        # else:
-        #     sell_inform = False
-        #
-        # # 平仓信号
-        # if up_mz != 0:
-        #     buy_close_inform = True
-        # else:
-        #     buy_close_inform = False
-        # if down_mz != 0:
-        #     sell_close_inform = True
-        # else:
-        #     sell_close_inform = False
+
+        # 平仓信号
+        if up_mz != 0:
+            buy_close_inform = True
+        else:
+            buy_close_inform = False
+        if down_mz != 0:
+            sell_close_inform = True
+        else:
+            sell_close_inform = False
         ###################################################################
         # 交易池子
         # 多头交易
@@ -131,45 +132,45 @@ class FxMzStrategy(CtaTemplate):
             if self.pos >= 0:
                 self.buy(price, 1)
                 self.sell(price, 1)
-            # # 当前持有空头仓位，则先平空，再开多
-            # elif self.pos < 0:
-            #     self.cover(price, 1)
-                # self.buy(price, 1)
-        #
-        # elif sell_close_inform:
-        #     price = bar.close_price - 5
-        #     # 当前无仓位，则直接开空
-        #     if self.pos <= 0:
-        #         pass
-        #
-        #     # 当前持有空头仓位，则先平多，再开空
-        #     elif self.pos > 0:
-        #         self.sell(price, 1)
-        #         # self.short(price, 1)
-        #
-        # # 空头交易
-        # # 如果发生了死叉
-        # elif sell_inform:
-        #     price = bar.close_price - 5
-        #     # 当前无仓位，则直接开空
-        #     if self.pos <= 0:
-        #         self.short(price, 1)
-        #
-        #     # 当前持有空头仓位，则先平多，再开空
-        #     elif self.pos > 0:
-        #         self.sell(price, 1)
-        #         # self.short(price, 1)
-        #
-        # elif buy_close_inform:
-        #
-        #     price = bar.close_price + 5
-        #     # 当前无仓位，则直接开空
-        #     if self.pos >= 0:
-        #         pass
-        #
-        #     # 当前持有空头仓位，则先平多，再开空
-        #     elif self.pos < 0:
-        #         self.cover(price, 1)
+            # 当前持有空头仓位，则先平空，再开多
+            elif self.pos < 0:
+                self.cover(price, 1)
+                self.buy(price, 1)
+
+        elif sell_close_inform:
+            price = bar.close_price - 5
+            # 当前无仓位，则直接开空
+            if self.pos <= 0:
+                pass
+
+            # 当前持有空头仓位，则先平多，再开空
+            elif self.pos > 0:
+                self.sell(price, 1)
+                # self.short(price, 1)
+
+        # 空头交易
+        # 如果发生了死叉
+        elif sell_inform:
+            price = bar.close_price - 5
+            # 当前无仓位，则直接开空
+            if self.pos <= 0:
+                self.short(price, 1)
+
+            # 当前持有空头仓位，则先平多，再开空
+            elif self.pos > 0:
+                self.sell(price, 1)
+                # self.short(price, 1)
+
+        elif buy_close_inform:
+
+            price = bar.close_price + 5
+            # 当前无仓位，则直接开空
+            if self.pos >= 0:
+                pass
+
+            # 当前持有空头仓位，则先平多，再开空
+            elif self.pos < 0:
+                self.cover(price, 1)
 
         self.put_event()
 

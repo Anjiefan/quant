@@ -816,18 +816,19 @@ class GanManager(ArrayManager):
         """
         Simple moving average.
         """
-        result = (self.high[-2] < self.high[-3]) and (self.high[-3] < self.high[-4]) and \
-                 (self.high[-4] > self.high[-5]) and (self.high[-5] > self.high[-6])
+        result = (self.high[-1] < self.high[-2]) and (self.high[-2] < self.high[-3]) and \
+                 (self.high[-3] > self.high[-4]) and (self.high[-4] > self.high[-5])
+
         if result:
-            return self.high[-4]
+            return self.high[-3]
         return 0
 
     def down_fx(self):
         """
         Simple moving average.
         """
-        result = (self.low[-2] > self.low[-3]) and (self.low[-3] > self.low[-4]) and \
-                 (self.low[-4] < self.low[-5]) and (self.low[-5] < self.low[-6])
+        result = (self.low[-1] > self.low[-2]) and (self.low[-2] > self.low[-3]) and \
+                 (self.low[-3] < self.low[-4]) and (self.low[-4] < self.low[-5])
         if result:
             return self.low[-3]
         return 0
@@ -836,20 +837,20 @@ class GanManager(ArrayManager):
         """
         Simple moving average.
         """
-        result = (self.high[-2] > self.high[-3]) and (self.low[-2] <= self.high[-3]) and \
-                 (self.high[-3] > self.high[-4]) and (self.low[-3] <= self.high[-4])
+        result = (self.high[-1] > self.high[-2]) and (self.low[-1] <= self.high[-2]) and \
+                 (self.high[-2] > self.high[-3]) and (self.low[-2] <= self.high[-3])
         if result:
-            return self.low[-4]
+            return self.low[-3]
         return 0
 
     def down_mz(self):
         """
         Simple moving average.
         """
-        result = (self.high[-4] > self.high[-3]) and (self.low[-4] <= self.high[-3]) and \
-                 (self.high[-3] > self.high[-2]) and (self.low[-3] <= self.high[-4])
+        result = (self.high[-3] > self.high[-2]) and (self.low[-3] <= self.high[-2]) and \
+                 (self.high[-2] > self.high[-1]) and (self.low[-2] <= self.high[-3])
         if result:
-            return self.high[-4]
+            return self.high[-3]
         return 0
 
 
