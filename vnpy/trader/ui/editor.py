@@ -2,7 +2,6 @@ from typing import Callable, Dict
 from pathlib import Path
 
 from PyQt5 import QtWidgets, Qsci, QtGui
-
 from vnpy.event import EventEngine
 from ..engine import MainEngine
 
