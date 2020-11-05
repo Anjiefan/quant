@@ -196,17 +196,7 @@ class ManagerWidget(QtWidgets.QWidget):
                 item.setText(2, d["symbol"])
                 item.setText(3, d["exchange"])
                 self.child[d["interval"]].addChild(item)
-                # if d["interval"] == Interval.MINUTE.value:
-                #     self.minute_child.addChild(item)
-                # elif d["interval"] == Interval.MINUTE_3.value:
-                #     self.minute_child_3.addChild(item)
-                # else:
-                #     self.daily_child.addChild(item)
-                #
-                # elif d["interval"] == Interval.HOUR.value:
-                #     self.hour_child.addChild(item)
-                # else:
-                #     self.daily_child.addChild(item)
+
 
                 output_button = QtWidgets.QPushButton("导出")
                 output_func = partial(
