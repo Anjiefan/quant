@@ -40,7 +40,7 @@ class FxStrategy(CtaTemplate):
         self.bg = BarGenerator(self.on_bar)
 
         # 时间序列容器：计算技术指标用
-        self.am = GanManager()
+        self.am = GanManager(size=10)
 
     def on_init(self):
         """
@@ -107,23 +107,6 @@ class FxStrategy(CtaTemplate):
                 cross_below = False
         else:
             cross_over = False
-        # fast_ma = am.sma(self.fast_window, array=True)
-        # self.fast_ma0 = fast_ma[-1]     # T时刻数值
-        # self.fast_ma1 = fast_ma[-2]     # T-1时刻数值
-        #
-        # # 计算慢速均线
-        # slow_ma = am.sma(self.slow_window, array=True)
-        # self.slow_ma0 = slow_ma[-1]
-        # self.slow_ma1 = slow_ma[-2]
-
-        # 判断是否金叉
-        # cross_over = (self.fast_ma0 > self.slow_ma0 and
-        #               self.fast_ma1 < self.slow_ma1)
-
-
-        # 判断是否死叉
-        # cross_below = (self.fast_ma0 < self.slow_ma0 and
-        #                self.fast_ma1 > self.slow_ma1)
         ###################################################################
         # 交易池子
 

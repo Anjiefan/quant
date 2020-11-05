@@ -1121,6 +1121,167 @@ class BacktestingEngine:
         """
         return list(self.daily_results.values())
 
+class FXBacktestingEngine(BacktestingEngine):
+    def cross_limit_order(self):
+        """
+        Cross limit order with last bar/tick data.
+        """
+        if self.mode == BacktestingMode.BAR:
+            long_cross_price = self.bar.low_price
+            short_cross_price = self.bar.high_price
+            long_best_price = self.bar.open_price
+            short_best_price = self.bar.open_price
+        else:
+            long_cross_price = self.tick.ask_price_1
+            short_cross_price = self.tick.bid_price_1
+            long_best_price = long_cross_price
+            short_best_price = short_cross_price
+
+        for order in list(self.active_limit_orders.values()):
+            # Push order update with status "not traded" (pending).
+            if order.status == Status.SUBMITTING:
+                order.status = Status.NOTTRADED
+                self.strategy.on_order(order)
+
+            # Check whether limit orders can be filled.
+            long_cross = (
+                    order.direction == Direction.LONG
+                    and order.price >= long_cross_price
+                    and long_cross_price > 0
+            )
+
+            short_cross = (
+                    order.direction == Direction.SHORT
+                    and order.price <= short_cross_price
+                    and short_cross_price > 0
+            )
+
+            if not long_cross and not short_cross:
+                continue
+
+            # Push order udpate with status "all traded" (filled).
+            order.traded = order.volume
+            order.status = Status.ALLTRADED
+            self.strategy.on_order(order)
+
+            self.active_limit_orders.pop(order.vt_orderid)
+
+            # Push trade update
+            self.trade_count += 1
+
+            if long_cross:
+                trade_price = min(order.price, long_best_price)
+                pos_change = order.volume
+            else:
+                trade_price = max(order.price, short_best_price)
+                pos_change = -order.volume
+
+            trade = TradeData(
+                symbol=order.symbol,
+                exchange=order.exchange,
+                orderid=order.orderid,
+                tradeid=str(self.trade_count),
+                direction=order.direction,
+                offset=order.offset,
+                price=trade_price,
+                volume=order.volume,
+                datetime=self.datetime,
+                gateway_name=self.gateway_name,
+            )
+
+            self.strategy.pos += pos_change
+            self.strategy.on_trade(trade)
+
+            self.trades[trade.vt_tradeid] = trade
+
+    def cross_stop_order(self):
+        """
+        Cross stop order with last bar/tick data.
+        """
+        if self.mode == BacktestingMode.BAR:
+            long_cross_price = self.bar.high_price
+            short_cross_price = self.bar.low_price
+            long_best_price = self.bar.open_price
+            short_best_price = self.bar.open_price
+        else:
+            long_cross_price = self.tick.last_price
+            short_cross_price = self.tick.last_price
+            long_best_price = long_cross_price
+            short_best_price = short_cross_price
+
+        for stop_order in list(self.active_stop_orders.values()):
+            # Check whether stop order can be triggered.
+            long_cross = (
+                    stop_order.direction == Direction.LONG
+                    and stop_order.price <= long_cross_price
+            )
+
+            short_cross = (
+                    stop_order.direction == Direction.SHORT
+                    and stop_order.price >= short_cross_price
+            )
+
+            if not long_cross and not short_cross:
+                continue
+
+            # Create order data.
+            self.limit_order_count += 1
+
+            order = OrderData(
+                symbol=self.symbol,
+                exchange=self.exchange,
+                orderid=str(self.limit_order_count),
+                direction=stop_order.direction,
+                offset=stop_order.offset,
+                price=stop_order.price,
+                volume=stop_order.volume,
+                traded=stop_order.volume,
+                status=Status.ALLTRADED,
+                gateway_name=self.gateway_name,
+                datetime=self.datetime
+            )
+
+            self.limit_orders[order.vt_orderid] = order
+
+            # Create trade data.
+            if long_cross:
+                trade_price = max(stop_order.price, long_best_price)
+                pos_change = order.volume
+            else:
+                trade_price = min(stop_order.price, short_best_price)
+                pos_change = -order.volume
+
+            self.trade_count += 1
+
+            trade = TradeData(
+                symbol=order.symbol,
+                exchange=order.exchange,
+                orderid=order.orderid,
+                tradeid=str(self.trade_count),
+                direction=order.direction,
+                offset=order.offset,
+                price=trade_price,
+                volume=order.volume,
+                datetime=self.datetime,
+                gateway_name=self.gateway_name,
+            )
+
+            self.trades[trade.vt_tradeid] = trade
+
+            # Update stop order.
+            stop_order.vt_orderids.append(order.vt_orderid)
+            stop_order.status = StopOrderStatus.TRIGGERED
+
+            if stop_order.stop_orderid in self.active_stop_orders:
+                self.active_stop_orders.pop(stop_order.stop_orderid)
+
+            # Push update to strategy.
+            self.strategy.on_stop_order(stop_order)
+            self.strategy.on_order(order)
+
+            self.strategy.pos += pos_change
+            self.strategy.on_trade(trade)
+
 
 class DailyResult:
     """"""

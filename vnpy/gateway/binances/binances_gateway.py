@@ -82,14 +82,39 @@ DIRECTION_BINANCES2VT: Dict[str, Direction] = {v: k for k, v in DIRECTION_VT2BIN
 
 INTERVAL_VT2BINANCES: Dict[Interval, str] = {
     Interval.MINUTE: "1m",
+    Interval.MINUTE_3: "3m",
+    Interval.MINUTE_5: "5m",
+    Interval.MINUTE_15: "15m",
+    Interval.MINUTE_30: "30m",
     Interval.HOUR: "1h",
+    Interval.HOUR_2: "2h",
+    Interval.HOUR_4: "4h",
+    Interval.HOUR_6: "6h",
+    Interval.HOUR_8: "8h",
+    Interval.HOUR_12: "12h",
     Interval.DAILY: "1d",
+    Interval.DAILY_3: "3d",
+    Interval.WEEKLY: "1w",
+    Interval.MONTH: "1M",
 }
 
 TIMEDELTA_MAP: Dict[Interval, timedelta] = {
     Interval.MINUTE: timedelta(minutes=1),
+    Interval.MINUTE_3: timedelta(minutes=3),
+    Interval.MINUTE_5: timedelta(minutes=5),
+    Interval.MINUTE_15: timedelta(minutes=15),
+    Interval.MINUTE_30: timedelta(minutes=30),
     Interval.HOUR: timedelta(hours=1),
+    Interval.HOUR_2: timedelta(hours=2),
+    Interval.HOUR_4:timedelta(hours=4),
+    Interval.HOUR_6: timedelta(hours=6),
+    Interval.HOUR_8: timedelta(hours=8),
+    Interval.HOUR_12: timedelta(hours=12),
     Interval.DAILY: timedelta(days=1),
+    Interval.DAILY_3: timedelta(days=3),
+    Interval.WEEKLY: timedelta(days=7),
+    Interval.MONTH: timedelta(days=30),
+
 }
 
 CHINA_TZ = pytz.timezone("Asia/Shanghai")

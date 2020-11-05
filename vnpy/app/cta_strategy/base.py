@@ -46,8 +46,13 @@ EVENT_CTA_LOG = "eCtaLog"
 EVENT_CTA_STRATEGY = "eCtaStrategy"
 EVENT_CTA_STOPORDER = "eCtaStopOrder"
 
+
 INTERVAL_DELTA_MAP = {
     Interval.MINUTE: timedelta(minutes=1),
+    Interval.MINUTE_3: timedelta(minutes=3),
+    Interval.MINUTE_5: timedelta(minutes=5),
+    Interval.MINUTE_15: timedelta(minutes=15),
+    Interval.MINUTE_30: timedelta(minutes=30),
     Interval.HOUR: timedelta(hours=1),
     Interval.DAILY: timedelta(days=1),
 }

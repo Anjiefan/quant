@@ -807,6 +807,10 @@ class ArrayManager(object):
         return result[-1]
 
 
+
+
+
+
 class GanManager(ArrayManager):
     def up_fx(self):
         """
