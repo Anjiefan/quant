@@ -100,77 +100,90 @@ class FxMzStrategy(CtaTemplate):
         down_mz = am.down_mz()
         # 卖出入信号
         if up_fx != 0:
-            sell_inform = True
+            short_inform = True
         else:
-            sell_inform = False
+            short_inform = False
         # 买入信号
         if down_fx != 0:
             buy_inform = True
-            if sell_inform:
+            if short_inform:
                 buy_inform = False
-                sell_inform = False
+                short_inform = False
         else:
             buy_inform = False
 
         # 平仓信号
         if up_mz != 0:
-            buy_close_inform = True
+            cover_inform = True
         else:
-            buy_close_inform = False
+            cover_inform = False
         if down_mz != 0:
-            sell_close_inform = True
+            sell_inform = True
         else:
-            sell_close_inform = False
+            sell_inform = False
+
         ###################################################################
         # 交易池子
         # 多头交易
-        # 如果发生了金叉
         if buy_inform:
             # 为了保证成交，在K线收盘价上加5发出限价单
             price = bar.close_price + 5
-            # 当前无仓位，则直接开多
+            # 当前多头仓位，则直接开多
             if self.pos >= 0:
                 self.buy(price, 1)
-            # 当前持有空头仓位，则先平空，再开多
+                print(1)
+                print(bar.datetime)
+                print("当前多头仓位，则直接开多")
+            # 当前持有空头仓位，则平空
             elif self.pos < 0:
                 self.cover(price, 1)
-                self.buy(price, 1)
-
-        elif sell_close_inform:
-            price = bar.close_price - 5
-            # 当前无仓位，则直接开空
-            if self.pos <= 0:
-                pass
-
-            # 当前持有空头仓位，则先平多，再开空
-            elif self.pos > 0:
-                self.sell(price, 1)
-                # self.short(price, 1)
-
-        # 空头交易
-        # 如果发生了死叉
+                print(1)
+                print(bar.datetime)
+                print("当前持有空头仓位，则平空")
+        # 多头平仓
         elif sell_inform:
             price = bar.close_price - 5
-            # 当前无仓位，则直接开空
+            # 当前空头仓位，需平多单，不操作
             if self.pos <= 0:
-                self.short(price, 1)
-
-            # 当前持有空头仓位，则先平多，再开空
+                pass
+                print(2)
+                print(bar.datetime)
+                print("当前空头仓位，需平多单，不操作")
+            # 当前持有多头仓位，直接平多单
             elif self.pos > 0:
                 self.sell(price, 1)
-                # self.short(price, 1)
+                print(2)
+                print(bar.datetime)
+                print("当前持有多头仓位，直接平多单")
+        # 空头开仓交易
+        elif short_inform:
+            price = bar.close_price - 5
+            # 当前空头仓位，则直接开空
+            if self.pos <= 0:
+                self.short(price, 1)
+                print(3)
+                print("当前空头仓位，则直接开空")
+            # 当前持有多头仓位，则平多
+            elif self.pos > 0:
+                self.sell(price, 1)
+                print(3)
+                print("当前持有多头仓位，则平多")
 
-        elif buy_close_inform:
+        elif cover_inform:
 
             price = bar.close_price + 5
-            # 当前无仓位，则直接开空
+            # 当前多头仓位，平空单，不操作
             if self.pos >= 0:
                 pass
-
-            # 当前持有空头仓位，则先平多，再开空
+                print(4)
+                print(bar.datetime)
+                print("当前多头仓位，不操作")
+            # 当前持有空头仓位，则平空
             elif self.pos < 0:
                 self.cover(price, 1)
-
+                print(4)
+                print(bar.datetime)
+                print("当前持有空头仓位，则平空")
         self.put_event()
 
     def on_order(self, order: OrderData):
@@ -178,6 +191,7 @@ class FxMzStrategy(CtaTemplate):
         通过该函数收到委托状态更新推送。
         """
         pass
+
     def on_trade(self, trade: TradeData):
         """
         通过该函数收到成交推送。

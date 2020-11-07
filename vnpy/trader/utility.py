@@ -837,8 +837,8 @@ class GanManager(ArrayManager):
         """
         Simple moving average.
         """
-        result = (self.high[-1] > self.high[-2]) and (self.low[-1] <= self.high[-2]) and \
-                 (self.high[-2] > self.high[-3]) and (self.low[-2] <= self.high[-3])
+        result = (self.high[-1] > self.high[-2]) and (self.low[-2] < self.low[-1] <= self.high[-2]) and \
+                 (self.high[-2] > self.high[-3]) and (self.low[-3] < self.low[-2] <= self.high[-3])
         if result:
             return self.low[-3]
         return 0
@@ -847,8 +847,8 @@ class GanManager(ArrayManager):
         """
         Simple moving average.
         """
-        result = (self.high[-3] > self.high[-2]) and (self.low[-3] <= self.high[-2]) and \
-                 (self.high[-2] > self.high[-1]) and (self.low[-2] <= self.high[-3])
+        result = (self.high[-3] > self.high[-2]) and (self.low[-2] < self.low[-3] < self.high[-2]) and \
+                 (self.high[-2] > self.high[-1]) and (self.low[-3] < self.low[-2] < self.high[-3])
         if result:
             return self.high[-3]
         return 0

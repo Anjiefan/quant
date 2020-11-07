@@ -11,7 +11,7 @@ if __name__ == '__main__':
     engine.set_parameters(
         vt_symbol="BTCUSDT.BINANCE",
         interval="1h",
-        start=datetime(2020, 10, 25),
+        start=datetime(2020, 1, 25),
         end=datetime(2020, 11, 5),
         rate=0.25 / 10000,
         slippage=0.2,
