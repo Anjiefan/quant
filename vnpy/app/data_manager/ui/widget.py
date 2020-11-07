@@ -81,17 +81,68 @@ class ManagerWidget(QtWidgets.QWidget):
 
     def init_child(self) -> None:
         """"""
+        self.child = {}
         self.minute_child = QtWidgets.QTreeWidgetItem()
-        self.minute_child.setText(0, "分钟线")
+        self.minute_child.setText(0, "1分钟线")
         self.tree.addTopLevelItem(self.minute_child)
-
+        self.child[Interval.MINUTE.value]=self.minute_child
+        self.minute_child_3 = QtWidgets.QTreeWidgetItem()
+        self.minute_child_3.setText(0, "3分钟线")
+        self.tree.addTopLevelItem(self.minute_child_3)
+        self.child[Interval.MINUTE_3.value] = self.minute_child_3
+        self.minute_child_5 = QtWidgets.QTreeWidgetItem()
+        self.minute_child_5.setText(0, "5分钟线")
+        self.tree.addTopLevelItem(self.minute_child_5)
+        self.child[Interval.MINUTE_5.value] = self.minute_child_5
+        self.minute_child_15 = QtWidgets.QTreeWidgetItem()
+        self.minute_child_15.setText(0, "15分钟线")
+        self.tree.addTopLevelItem(self.minute_child_15)
+        self.child[Interval.MINUTE_15.value] = self.minute_child_15
+        self.minute_child_30 = QtWidgets.QTreeWidgetItem()
+        self.minute_child_30.setText(0, "30分钟线")
+        self.tree.addTopLevelItem(self.minute_child_30)
+        self.child[Interval.MINUTE_30.value] = self.minute_child_30
         self.hour_child = QtWidgets.QTreeWidgetItem(self.tree)
         self.hour_child.setText(0, "小时线")
         self.tree.addTopLevelItem(self.hour_child)
-
+        self.child[Interval.HOUR.value] = self.hour_child
+        self.hour_child_2 = QtWidgets.QTreeWidgetItem(self.tree)
+        self.hour_child_2.setText(0, "2小时线")
+        self.tree.addTopLevelItem(self.hour_child_2)
+        self.child[Interval.HOUR_2.value] = self.hour_child_2
+        self.hour_child_4 = QtWidgets.QTreeWidgetItem(self.tree)
+        self.hour_child_4.setText(0, "4小时线")
+        self.tree.addTopLevelItem(self.hour_child_4)
+        self.child[Interval.HOUR_4.value] = self.hour_child_4
+        self.hour_child_6 = QtWidgets.QTreeWidgetItem(self.tree)
+        self.hour_child_6.setText(0, "6小时线")
+        self.tree.addTopLevelItem(self.hour_child_6)
+        self.child[Interval.HOUR_6.value] = self.hour_child_6
+        self.hour_child_8 = QtWidgets.QTreeWidgetItem(self.tree)
+        self.hour_child_8.setText(0, "8小时线")
+        self.tree.addTopLevelItem(self.hour_child_8)
+        self.child[Interval.HOUR_8.value] = self.hour_child_8
+        self.hour_child_12 = QtWidgets.QTreeWidgetItem(self.tree)
+        self.hour_child_12.setText(0, "12小时线")
+        self.tree.addTopLevelItem(self.hour_child_12)
+        self.child[Interval.HOUR_12.value] = self.hour_child_12
         self.daily_child = QtWidgets.QTreeWidgetItem(self.tree)
         self.daily_child.setText(0, "日线")
         self.tree.addTopLevelItem(self.daily_child)
+        self.child[Interval.DAILY.value] = self.daily_child
+        self.daily_child_3 = QtWidgets.QTreeWidgetItem(self.tree)
+        self.daily_child_3.setText(0, "3日线")
+        self.tree.addTopLevelItem(self.daily_child_3)
+        self.child[Interval.DAILY_3.value] = self.daily_child_3
+        self.week_child = QtWidgets.QTreeWidgetItem(self.tree)
+        self.week_child.setText(0, "周线")
+        self.tree.addTopLevelItem(self.week_child)
+        self.child[Interval.WEEKLY.value] = self.week_child
+        self.month_child = QtWidgets.QTreeWidgetItem(self.tree)
+        self.month_child.setText(0, "月线")
+        self.tree.addTopLevelItem(self.month_child)
+        self.child[Interval.MONTH.value] = self.month_child
+
 
     def init_table(self) -> None:
         """"""
@@ -144,13 +195,8 @@ class ManagerWidget(QtWidgets.QWidget):
                 item.setText(1, ".".join([d["symbol"], d["exchange"]]))
                 item.setText(2, d["symbol"])
                 item.setText(3, d["exchange"])
+                self.child[d["interval"]].addChild(item)
 
-                if d["interval"] == Interval.MINUTE.value:
-                    self.minute_child.addChild(item)
-                elif d["interval"] == Interval.HOUR.value:
-                    self.hour_child.addChild(item)
-                else:
-                    self.daily_child.addChild(item)
 
                 output_button = QtWidgets.QPushButton("导出")
                 output_func = partial(
