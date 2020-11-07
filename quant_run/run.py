@@ -2,6 +2,7 @@ from app.data_manager import DataManagerApp
 from app.data_recorder import DataRecorderApp
 from app.excel_rtd import ExcelRtdApp
 from app.spread_trading import SpreadTradingApp
+from gateway.bitstamp import BitstampGateway
 from vnpy.event import EventEngine
 from vnpy.gateway.binance import BinanceGateway
 from vnpy.gateway.binances import BinancesGateway
@@ -24,6 +25,7 @@ def main():
     main_engine.add_gateway(BinancesGateway)
     main_engine.add_gateway(BitmexGateway)
     main_engine.add_gateway(OkexGateway)
+    main_engine.add_gateway(BitstampGateway)
 
     main_engine.add_app(ExcelRtdApp)
     main_engine.add_app(DataRecorderApp)
