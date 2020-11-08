@@ -168,9 +168,8 @@ class FxMzStrategy(CtaTemplate):
                 self.sell(price, 1)
                 print(3)
                 print("当前持有多头仓位，则平多")
-
+        # 空头平仓
         elif cover_inform:
-
             price = bar.close_price + 5
             # 当前多头仓位，平空单，不操作
             if self.pos >= 0:

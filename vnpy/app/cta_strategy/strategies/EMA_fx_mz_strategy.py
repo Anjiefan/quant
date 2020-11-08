@@ -18,19 +18,13 @@ class EmaFxMzStrategy(CtaTemplate):
     author = "Smart Trader"
 
     # 定义参数
-    EMA = 10
-    slow_window = 20
+    EMA = 15
 
     # 定义变量
-    fast_ma0 = 0.0
-    fast_ma1 = 0.0
-    slow_ma0 = 0.0
-    slow_ma1 = 0.0
-    buy_price = 0.0
-    sell_price = 0.0
+    bianliang = 15
     # 添加参数和变量名到对应的列表
-    parameters = ["fast_window", "slow_window"]
-    variables = ["fast_ma0", "fast_ma1", "slow_ma0", "slow_ma1"]
+    parameters = ["EMA"]
+    variables = ["bianliang"]
 
     def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
         """"""
@@ -40,7 +34,7 @@ class EmaFxMzStrategy(CtaTemplate):
         self.bg = BarGenerator(self.on_bar)
 
         # 时间序列容器：计算技术指标用
-        self.am = GanManager(size=40)
+        self.am = GanManager(size=self.EMA+5)
 
     def on_init(self):
         """
@@ -50,7 +44,7 @@ class EmaFxMzStrategy(CtaTemplate):
         self.write_log("策略初始化")
 
         # 加载10天的历史数据用于初始化回放
-        self.load_bar(10)
+        self.load_bar(40)
 
     def on_start(self):
         """
@@ -94,17 +88,18 @@ class EmaFxMzStrategy(CtaTemplate):
         ##############################################################################
         # 指标信号发送池子
         # 计算快速均线
-        up_fx = am.up_fx()
-        down_fx = am.down_fx()
-        up_mz = am.up_mz()
-        down_mz = am.down_mz()
+        ema_up_fx = am.ema_up_fx(self.EMA)
+        ema_down_fx = am.ema_down_fx(self.EMA)
+        ema_up_mz = am.ema_up_mz(self.EMA)
+        ema_down_mz = am.ema_down_mz(self.EMA)
+
         # 卖出入信号
-        if up_fx != 0:
+        if ema_up_fx != 0:
             short_inform = True
         else:
             short_inform = False
         # 买入信号
-        if down_fx != 0:
+        if ema_down_fx != 0:
             buy_inform = True
             if short_inform:
                 buy_inform = False
@@ -113,11 +108,11 @@ class EmaFxMzStrategy(CtaTemplate):
             buy_inform = False
 
         # 平仓信号
-        if up_mz != 0:
+        if ema_up_mz != 0:
             cover_inform = True
         else:
             cover_inform = False
-        if down_mz != 0:
+        if ema_down_mz != 0:
             sell_inform = True
         else:
             sell_inform = False
