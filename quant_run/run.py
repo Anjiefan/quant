@@ -13,6 +13,8 @@ from vnpy.trader.engine import MainEngine
 from vnpy.trader.ui import MainWindow, create_qapp
 from vnpy.gateway.okex import OkexGateway
 from vnpy.app.cta_backtester import CtaBacktesterApp
+
+
 def main():
     """Start VN Trader"""
     qapp = create_qapp()
