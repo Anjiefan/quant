@@ -849,45 +849,53 @@ class GanManager(ArrayManager):
             return self.high[-3]
         return 0
 
-    def ema_up_fx(self):
+    def ema_up_fx(self,ema):
         """
         Simple moving average.
         """
-        result = (self.high[-1] < self.high[-2]) and (self.high[-2] < self.high[-3]) and \
-                 (self.high[-3] > self.high[-4]) and (self.high[-4] > self.high[-5])
+        ema_high = talib.EMA(self.high, timeperiod=ema)
+        ema_low = talib.EMA(self.low, timeperiod=ema)
+        result = (ema_high[-1] < ema_high[-2]) and (ema_high[-2] < ema_high[-3]) and \
+                 (ema_high[-3] > ema_high[-4]) and (ema_high[-4] > ema_high[-5])
 
         if result:
-            return self.high[-3]
+            return ema_high[-3]
         return 0
 
-    def ema_down_fx(self):
+    def ema_down_fx(self,ema):
         """
         Simple moving average.
         """
-        result = (self.low[-1] > self.low[-2]) and (self.low[-2] > self.low[-3]) and \
-                 (self.low[-3] < self.low[-4]) and (self.low[-4] < self.low[-5])
+        ema_high = talib.EMA(self.high, timeperiod=ema)
+        ema_low = talib.EMA(self.low, timeperiod=ema)
+        result = (ema_low[-1] > ema_low[-2]) and (ema_low[-2] > ema_low[-3]) and \
+                 (ema_low[-3] < ema_low[-4]) and (ema_low[-4] < ema_low[-5])
         if result:
-            return self.low[-3]
+            return ema_low[-3]
         return 0
 
-    def ema_up_mz(self):
+    def ema_up_mz(self, ema):
         """
         Simple moving average.
         """
-        result = (self.high[-1] > self.high[-2]) and (self.low[-2] < self.low[-1] <= self.high[-2]) and \
-                 (self.high[-2] > self.high[-3]) and (self.low[-3] < self.low[-2] <= self.high[-3])
+        ema_high = talib.EMA(self.high, timeperiod=ema)
+        ema_low = talib.EMA(self.low, timeperiod=ema)
+        result = (ema_high[-1] > ema_high[-2]) and (ema_low[-2] < ema_low[-1] <= ema_high[-2]) and \
+                 (ema_high[-2] > ema_high[-3]) and (ema_low[-3] < ema_low[-2] <= ema_high[-3])
         if result:
-            return self.low[-3]
+            return ema_low[-3]
         return 0
 
-    def ema_down_mz(self):
+    def ema_down_mz(self, ema):
         """
         Simple moving average.
         """
-        result = (self.high[-3] > self.high[-2]) and (self.low[-2] < self.low[-3] < self.high[-2]) and \
-                 (self.high[-2] > self.high[-1]) and (self.low[-3] < self.low[-2] < self.high[-3])
+        ema_high = talib.EMA(self.high, timeperiod=ema)
+        ema_low = talib.EMA(self.low, timeperiod=ema)
+        result = (ema_high[-3] > ema_high[-2]) and (ema_low[-2] < ema_low[-3] < ema_high[-2]) and \
+                 (ema_high[-2] > ema_high[-1]) and (ema_low[-3] < ema_low[-2] < ema_high[-3])
         if result:
-            return self.high[-3]
+            return ema_high[-3]
         return 0
 
 

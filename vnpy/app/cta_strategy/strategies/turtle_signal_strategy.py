@@ -1,3 +1,4 @@
+from trader.constant import Interval
 from vnpy.app.cta_strategy import (
     CtaTemplate,
     StopOrder,
@@ -38,7 +39,7 @@ class TurtleSignalStrategy(CtaTemplate):
         """"""
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
 
-        self.bg = BarGenerator(self.on_bar)
+        self.bg = BarGenerator(self.on_bar,interval=Interval.HOUR_4)
         self.am = ArrayManager()
 
     def on_init(self):

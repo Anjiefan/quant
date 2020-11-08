@@ -13,6 +13,7 @@ from vnpy.trader.engine import MainEngine
 from vnpy.trader.ui import MainWindow, create_qapp
 from vnpy.gateway.okex import OkexGateway
 from vnpy.app.cta_backtester import CtaBacktesterApp
+from vnpy.app.cta_strategy import CtaStrategyApp
 
 
 def main():
@@ -34,6 +35,7 @@ def main():
     main_engine.add_app(DataManagerApp)
     main_engine.add_app(CtaBacktesterApp)
     main_engine.add_app(SpreadTradingApp)
+    main_engine.add_app(CtaStrategyApp)
 
     main_window = MainWindow(main_engine, event_engine)
     main_window.showMaximized()
