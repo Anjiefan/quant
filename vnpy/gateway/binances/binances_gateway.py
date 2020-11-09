@@ -97,7 +97,6 @@ INTERVAL_VT2BINANCES: Dict[Interval, str] = {
     Interval.WEEKLY: "1w",
     Interval.MONTH: "1M",
 }
-
 TIMEDELTA_MAP: Dict[Interval, timedelta] = {
     Interval.MINUTE: timedelta(minutes=1),
     Interval.MINUTE_3: timedelta(minutes=3),
@@ -116,6 +115,7 @@ TIMEDELTA_MAP: Dict[Interval, timedelta] = {
     Interval.MONTH: timedelta(days=30),
 
 }
+
 
 CHINA_TZ = pytz.timezone("Asia/Shanghai")
 
