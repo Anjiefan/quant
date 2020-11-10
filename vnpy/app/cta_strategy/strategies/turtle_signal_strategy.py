@@ -39,7 +39,7 @@ class TurtleSignalStrategy(CtaTemplate):
         """"""
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
 
-        self.bg = BarGenerator(self.on_bar,interval=Interval.MINUTE)
+        self.bg = BarGenerator(self.on_bar,interval=Interval.HOUR,window=4,on_window_bar=self.on_window_bar)
         self.am = ArrayManager()
 
     def on_init(self):
@@ -67,10 +67,7 @@ class TurtleSignalStrategy(CtaTemplate):
         """
         self.bg.update_tick(tick)
 
-    def on_bar(self, bar: BarData):
-        """
-        Callback of new bar data update.
-        """
+    def on_window_bar(self,bar):
         self.cancel_all()
 
         self.am.update_bar(bar)
@@ -108,6 +105,13 @@ class TurtleSignalStrategy(CtaTemplate):
             self.cover(cover_price, abs(self.pos), True)
 
         self.put_event()
+
+    def on_bar(self, bar: BarData):
+        """
+        Callback of new bar data update.
+        """
+        self.bg.update_bar(bar)
+
 
     def on_trade(self, trade: TradeData):
         """
