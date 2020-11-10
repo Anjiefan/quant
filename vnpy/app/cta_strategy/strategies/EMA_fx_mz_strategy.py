@@ -9,6 +9,7 @@ from vnpy.app.cta_strategy import (
     ArrayManager,
 )
 from vnpy.trader.utility import GanManager
+from trader.constant import Interval
 
 
 class EmaFxMzStrategy(CtaTemplate):
@@ -32,13 +33,12 @@ class EmaFxMzStrategy(CtaTemplate):
     parameters = ["EMA"]
     variables = ["bianliang"]
 
-
     def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
         """"""
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
 
         # K线合成器：从Tick合成分钟K线用
-        self.bg = BarGenerator(self.on_bar)
+        self.bg = BarGenerator(self.on_bar, interval=Interval.MINUTE, window=2, on_window_bar=self.shipan)
 
         # 时间序列容器：计算技术指标用
         self.am = GanManager(size=self.EMA+5)
@@ -78,9 +78,32 @@ class EmaFxMzStrategy(CtaTemplate):
         self.bg.update_tick(tick)
 
     def on_bar(self, bar: BarData):
+        self.bg.update_bar(bar)
+
+    def on_order(self, order: OrderData):
         """
-        通过该函数收到新的1分钟K线推送。
+        通过该函数收到委托状态更新推送。
         """
+        pass
+
+    def on_trade(self, trade: TradeData):
+        """
+        通过该函数收到成交推送。
+        """
+        # 成交后策略逻辑仓位发生变化，需要通知界面更新。
+        # self.cta_engine.main_engine.get_account('1')
+        self.put_event()
+
+    def on_stop_order(self, stop_order: StopOrder):
+        """
+        通过该函数收到本地停止单推送。
+        """
+        pass
+
+    def shipan(self,bar):
+        """
+          通过该函数收到新的1分钟K线推送。
+          """
         am = self.am
 
         # 更新K线到时间序列容器中
@@ -187,24 +210,3 @@ class EmaFxMzStrategy(CtaTemplate):
                 print(bar.datetime)
                 print("当前持有空头仓位，则平空")
         self.put_event()
-
-    def on_order(self, order: OrderData):
-        """
-        通过该函数收到委托状态更新推送。
-        """
-        pass
-
-    def on_trade(self, trade: TradeData):
-        """
-        通过该函数收到成交推送。
-        """
-        # 成交后策略逻辑仓位发生变化，需要通知界面更新。
-        # self.cta_engine.main_engine.get_account('1')
-        self.put_event()
-
-    def on_stop_order(self, stop_order: StopOrder):
-        """
-        通过该函数收到本地停止单推送。
-        """
-        pass
-
