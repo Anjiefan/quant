@@ -209,3 +209,4 @@ class EmaFxMzStrategy(CtaTemplate):
                 print(bar.datetime)
                 print("当前持有空头仓位，则平空")
         self.put_event()
+
