@@ -6,40 +6,40 @@ from vnpy.app.cta_strategy import (
     TradeData,
     OrderData,
     BarGenerator,
-    ArrayManager,
+
 )
 from vnpy.trader.utility import GanManager
-from trader.constant import Interval
 
 
-class EmaFxMzStrategy(CtaTemplate):
+class EmaKMzStrategy(CtaTemplate):
     """演示用的简单双均线"""
 
     # 策略作者
     author = "Smart Trader"
 
     # 定义参数
+    long_ema = 300
+    short_ema = 60
+    k_length = 60
 
-    EMA = 15
-
-    # 定义变量
-    bianliang = 15
+    # # 定义变量
+    # buy_inform = -1
+    # sell_inform = -1
+    # short_inform = -1
+    # cover_inform = -1
     # 添加参数和变量名到对应的列表
-
-    # variables = ["fast_ma0", "fast_ma1", "slow_ma0", "slow_ma1"]
-
-    parameters = ["EMA"]
-    variables = ["bianliang"]
+    parameters = ["long_ema", "short_ema", "k_length"]
+    # variables = ["buy_inform", "sell_inform", "short_inform", "cover_inform"]
 
     def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
         """"""
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
 
         # K线合成器：从Tick合成分钟K线用
-        self.bg = BarGenerator(self.on_bar)  #  , interval=Interval.MINUTE, window=2, on_window_bar=self.shipan
+        self.bg = BarGenerator(self.on_bar)
 
         # 时间序列容器：计算技术指标用
-        self.am = GanManager(size=self.EMA+5)
+        self.am = GanManager(size=self.long_ema+self.short_ema+1)
 
     def on_init(self):
         """
@@ -77,8 +77,8 @@ class EmaFxMzStrategy(CtaTemplate):
 
     def on_bar(self, bar: BarData):
         """
-            通过该函数收到新的1分钟K线推送。
-            """
+        通过该函数收到新的1分钟K线推送。
+        """
         am = self.am
 
         # 更新K线到时间序列容器中
@@ -93,38 +93,25 @@ class EmaFxMzStrategy(CtaTemplate):
         ##############################################################################
         # 指标信号发送池子
         # 计算快速均线
-        ema_up_fx = am.ema_up_fx(self.EMA)
-        ema_down_fx = am.ema_down_fx(self.EMA)
-        ema_up_mz = am.ema_up_mz(self.EMA)
-        ema_down_mz = am.ema_down_mz(self.EMA)
 
-        # 卖出入信号
-        if ema_up_fx != 0:
-            short_inform = True
-        else:
-            short_inform = False
+        inform = am.ema_k(long_ema=self.long_ema, short_ema=self.short_ema, k_length=self.k_length)
+        buy_inform = (inform > 0)
+        cover_inform = (inform > 0)
+        sell_inform = (inform < 0)
+        short_inform = inform < 0
+        # # 交易信号
+        # if inform > 0:
+        #     buy_inform = True
+        #     # sell_inform = -1
+        #     # short_inform = -1
+        #     cover_inform = True
+        # elif inform < 0:
+        #     # buy_inform = -1
+        #     sell_inform = True
+        #     short_inform = True
+        #     # cover_inform = -1
+        # print(buy_inform,sell_inform,short_inform)
         # 买入信号
-        if ema_down_fx != 0:
-            buy_inform = True
-            if short_inform:
-                buy_inform = False
-                short_inform = False
-        else:
-            buy_inform = False
-
-        # 平仓信号
-        if ema_up_mz != 0:
-            cover_inform = True
-        else:
-            cover_inform = False
-        if ema_down_mz != 0:
-            sell_inform = True
-        else:
-            sell_inform = False
-
-        ###################################################################
-        # 交易池子
-        # 多头交易
         if buy_inform:
             # 为了保证成交，在K线收盘价上加5发出限价单
             price = bar.close_price + 5
@@ -155,7 +142,7 @@ class EmaFxMzStrategy(CtaTemplate):
                 print(2)
                 print(bar.datetime)
                 print("当前持有多头仓位，直接平多单")
-        # 空头开仓交易
+        # 卖出入信号
         elif short_inform:
             price = bar.close_price - 5
             # 当前空头仓位，则直接开空
@@ -168,9 +155,8 @@ class EmaFxMzStrategy(CtaTemplate):
                 self.sell(price, 1)
                 print(3)
                 print("当前持有多头仓位，则平多")
-
-        elif cover_inform:
-
+        # 空单平仓信号
+        elif cover_inform == 1:
             price = bar.close_price + 5
             # 当前多头仓位，平空单，不操作
             if self.pos >= 0:
@@ -184,8 +170,8 @@ class EmaFxMzStrategy(CtaTemplate):
                 print(4)
                 print(bar.datetime)
                 print("当前持有空头仓位，则平空")
-        self.put_event()
 
+        self.put_event()
 
     def on_order(self, order: OrderData):
         """
@@ -198,14 +184,10 @@ class EmaFxMzStrategy(CtaTemplate):
         通过该函数收到成交推送。
         """
         # 成交后策略逻辑仓位发生变化，需要通知界面更新。
-        # self.cta_engine.main_engine.get_account('1')
         self.put_event()
 
     def on_stop_order(self, stop_order: StopOrder):
         """
         通过该函数收到本地停止单推送。
         """
-        pass
-
-    def shipan(self, bar):
         pass

@@ -854,7 +854,6 @@ class GanManager(ArrayManager):
         Simple moving average.
         """
         ema_high = talib.EMA(self.high, timeperiod=ema)
-        ema_low = talib.EMA(self.low, timeperiod=ema)
         result = (ema_high[-1] < ema_high[-2]) and (ema_high[-2] < ema_high[-3]) and \
                  (ema_high[-3] > ema_high[-4]) and (ema_high[-4] > ema_high[-5])
 
@@ -866,7 +865,7 @@ class GanManager(ArrayManager):
         """
         Simple moving average.
         """
-        ema_high = talib.EMA(self.high, timeperiod=ema)
+
         ema_low = talib.EMA(self.low, timeperiod=ema)
         result = (ema_low[-1] > ema_low[-2]) and (ema_low[-2] > ema_low[-3]) and \
                  (ema_low[-3] < ema_low[-4]) and (ema_low[-4] < ema_low[-5])
@@ -897,6 +896,17 @@ class GanManager(ArrayManager):
         if result:
             return ema_high[-3]
         return 0
+
+    def ema_k(self, long_ema, short_ema, k_length):
+        short = talib.EMA(self.close, timeperiod=short_ema)
+        long = talib.EMA(short, timeperiod=long_ema)
+        k = talib.LINEARREG_SLOPE(self.close, timeperiod=k_length)
+        result = (long[-1] - short[-1])*(long[-2] - short[-2])
+        if result < 0:
+            jiaoyi = k[-1] * result
+            return jiaoyi
+        else:
+            return 0
 
 
 def virtual(func: Callable) -> Callable:
